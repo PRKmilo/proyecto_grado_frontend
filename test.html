@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <h2>WebSocket Test</h2>
+  <pre id="output"></pre>
+  <script>
+    const socket = new WebSocket("ws://localhost:8000/ws/notifications/10000061/");
+    const output = document.getElementById("output");
+
+    socket.onopen = () => {
+      output.innerText += "✅ Conectado al WebSocket\n";
+    };
+
+    socket.onmessage = (event) => {
+      output.innerText += "📩 Mensaje recibido: " + event.data + "\n";
+    };
+
+    socket.onerror = (error) => {
+      output.innerText += "❌ Error: " + error.message + "\n";
+    };
+
+    socket.onclose = () => {
+      output.innerText += "🔌 Conexión cerrada\n";
+    };
+  </script>
+</body>
+</html>

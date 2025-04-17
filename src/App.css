@@ -1,0 +1,17 @@
+@keyframes toolsScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-14rem * 7)); /* Ajusta este valor según el número de herramientas */
+  }
+}
+
+.tools-scroll {
+  animation: toolsScroll 20s linear infinite;
+  display: inline-flex;
+}
+
+.tools-scroll:hover {
+  animation-play-state: paused;
+}
