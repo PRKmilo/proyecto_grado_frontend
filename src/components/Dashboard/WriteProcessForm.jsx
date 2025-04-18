@@ -25,7 +25,6 @@ const WriteProcessForm = () => {
         direccion_predio: '',
         direccion_smart_contract: '',
         cedula_catastral: '',
-        user_id: '',
         beneficiario_id: '',
     });
 
@@ -269,10 +268,12 @@ ${'_'.repeat(70)}
                 }
             });
 
+            formDataToSend.append('user_id',sessionStorage.getItem("cedula"));
             // Agregar archivos
             formDataToSend.append('archivo_txt', txtBlob, `escritura_${formData.numero_escritura || 'nuevo'}.txt`);
             formDataToSend.append('archivo_pdf', pdfBlob, `escritura_${formData.numero_escritura || 'nuevo'}.pdf`);
 
+            console.log(formData)
             // Enviar al backend
             const response = await axios.post('http://localhost:8000/api/escrituras/', formDataToSend, {
                 headers: { 'Content-Type': 'multipart/form-data' }

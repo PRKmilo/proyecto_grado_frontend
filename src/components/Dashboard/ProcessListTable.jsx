@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Bell, AlertCircle, Clock, CheckCircle, Loader2, Filter, RefreshCw } from 'lucide-react';
+import { Bell, AlertCircle, Clock, CheckCircle, Loader2, RefreshCw } from 'lucide-react';
 import ModalConsulta from '../Modals/ModalConsulta';
 
 const ProcessListTable = () => {
@@ -19,27 +19,23 @@ const ProcessListTable = () => {
         const userRole = sessionStorage.getItem("rol");
 
         let processesResponse;
-
         if (userRole === "7") {
-          processesResponse = await axios.get(`http://127.0.0.1:8000/api/procesos/usuario/${userId}`);
+          processesResponse = await axios.get(`http://127.0.0.1:8000/api/procesos/usuario/${userId}/`);
         } else {
-          processesResponse = await axios.get("http://localhost:8000/api/procesos/");
+          processesResponse = await axios.get("http://127.0.0.1:8000/api/procesos/");
         }
 
         if (Array.isArray(processesResponse.data)) {
-          const formattedProcesses = processesResponse.data.map(proc => ({
-            id: proc.proceso_id,
-            name: proc.seriado_proceso,
-            status: proc.estado
-          }));
-          setProcesses(formattedProcesses);
+          setProcesses(
+            processesResponse.data.map(proc => ({
+              id: proc.proceso_id,
+              name: proc.seriado_proceso,
+              status: proc.estado
+            }))
+          );
         } else {
           setProcesses([]);
         }
-
-        // Fetch initial notifications if needed
-        // You could add an API call here to get past notifications
-
       } catch (err) {
         console.error("Error al obtener los datos:", err);
         setProcesses([]);
@@ -50,17 +46,15 @@ const ProcessListTable = () => {
 
     fetchData();
 
-    // WebSocket connection setup
+    // Configuración del WebSocket
     const setupWebSocket = () => {
       const userId = sessionStorage.getItem("cedula");
-      
-      // Close existing connection if any
+
       if (socketRef.current) {
         socketRef.current.close();
       }
-
-      // Create new connection
-      socketRef.current = new WebSocket(`ws://localhost:8000/ws/notifications/${userId}/`);
+   
+      socketRef.current = new WebSocket(`ws://127.0.0.1:8000/ws/notifications/${userId}/`);
 
       socketRef.current.onopen = () => {
         console.log("✅ Conectado al WebSocket de notificaciones");
@@ -70,13 +64,12 @@ const ProcessListTable = () => {
         try {
           const data = JSON.parse(event.data);
           const newNotification = {
-            id: data.id || Date.now(), // Fallback to timestamp if no id provided
+            id: data.id_notificacion || Date.now(),
             type: data.mensaje && data.mensaje.toLowerCase().includes("error") ? "alert" : "notification",
             message: data.mensaje || "Nueva notificación recibida",
             timestamp: new Date().toISOString()
           };
-          
-          // Use function form of setState to avoid stale state issues
+          // Agrega al principio de la lista y deja persistente
           setNotifications(prev => [newNotification, ...prev]);
         } catch (error) {
           console.error("❌ Error al parsear el mensaje del WebSocket:", error);
@@ -89,41 +82,39 @@ const ProcessListTable = () => {
 
       socketRef.current.onclose = () => {
         console.warn("🔌 WebSocket cerrado");
+        console.log("s+++++++++++++++++++++++++++++++++++++++++++++++++++++")
+        setTimeout(setupWebSocket, 3000);
       };
     };
 
     setupWebSocket();
 
-    // Cleanup function
     return () => {
-      if (socketRef.current) {
-        socketRef.current.close();
-        socketRef.current = null;
+      if (socketRef.current?.readyState === WebSocket.OPEN) {
+        socketRef.current.close();  // Solo cerrar si está abierto
       }
     };
-  }, []); // Empty dependency array - run once on mount
+  }, []);
 
   const handleRefresh = async () => {
-    const userId = sessionStorage.getItem("cedula");
-    const userRole = sessionStorage.getItem("rol");
     setLoading(true);
-    
     try {
+      const userId = sessionStorage.getItem("cedula");
+      const userRole = sessionStorage.getItem("rol");
       let processesResponse;
-      
       if (userRole === "7") {
-        processesResponse = await axios.get(`http://127.0.0.1:8000/api/procesos/usuario/${userId}`);
+        processesResponse = await axios.get(`http://127.0.0.1:8000/api/procesos/usuario/${userId}/`);
       } else {
-        processesResponse = await axios.get("http://localhost:8000/api/procesos/");
+        processesResponse = await axios.get("http://127.0.0.1:8000/api/procesos/");
       }
-
       if (Array.isArray(processesResponse.data)) {
-        const formattedProcesses = processesResponse.data.map(proc => ({
-          id: proc.proceso_id,
-          name: proc.seriado_proceso,
-          status: proc.estado
-        }));
-        setProcesses(formattedProcesses);
+        setProcesses(
+          processesResponse.data.map(proc => ({
+            id: proc.proceso_id,
+            name: proc.seriado_proceso,
+            status: proc.estado
+          }))
+        );
       }
     } catch (error) {
       console.error("Error al actualizar datos:", error);
@@ -147,35 +138,21 @@ const ProcessListTable = () => {
   };
 
   const getNotificationIcon = (type) => {
-    switch (type) {
-      case 'alert':
-        return <AlertCircle className="text-red-500" size={18} />;
-      case 'notification':
-        return <Bell className="text-blue-500" size={18} />;
-      default:
-        return <Bell className="text-gray-500" size={18} />;
-    }
+    return type === 'alert' 
+      ? <AlertCircle className="text-red-500" size={18} /> 
+      : <Bell className="text-blue-500" size={18} />;
   };
 
   const getStatusIcon = (status) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle className="text-green-500" size={16} />;
-      case 'pending':
-        return <Clock className="text-amber-500" size={16} />;
-      default:
-        return null;
-    }
+    if (status === 'completed') return <CheckCircle className="text-green-500" size={16} />;
+    if (status === 'pending')   return <Clock className="text-amber-500" size={16} />;
+    return null;
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString('es-ES', {
-      hour: '2-digit',
-      minute: '2-digit',
-      day: '2-digit',
-      month: '2-digit'
+  const formatDate = (dateString) =>
+    new Date(dateString).toLocaleString('es-ES', {
+      hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit'
     });
-  };
 
   return (
     <div className="flex h-screen w-full bg-gray-100 p-6">
@@ -184,16 +161,14 @@ const ProcessListTable = () => {
         <div className="bg-white rounded-lg shadow-md overflow-hidden h-full">
           <div className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white p-4 flex justify-between items-center">
             <h2 className="text-xl font-semibold">Lista de procesos</h2>
-            <div className="flex space-x-2">
-              <button 
-                onClick={handleRefresh}
-                className="bg-white/20 hover:bg-white/30 text-white p-2 rounded transition-colors flex items-center"
-                disabled={loading}
-              >
-                <RefreshCw size={16} className={`mr-1 ${loading ? 'animate-spin' : ''}`} />
-                <span>Actualizar</span>
-              </button>
-            </div>
+            <button 
+              onClick={handleRefresh}
+              className={`bg-white/20 hover:bg-white/30 text-white p-2 rounded transition-colors flex items-center ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={loading}
+            >
+              <RefreshCw size={16} className={`${loading ? 'animate-spin' : ''} mr-1`} />
+              <span>Actualizar</span>
+            </button>
           </div>
 
           {loading ? (
@@ -213,7 +188,7 @@ const ProcessListTable = () => {
                 <tbody>
                   {processes.length > 0 ? (
                     processes.map((process) => (
-                      <tr key={process.id} className="border-b border-gray-100 hover:bg-blue-50 transition-colors">
+                      <tr key={process.id} className="border-b hover:bg-blue-50 transition-colors">
                         <td className="py-4 px-4 flex items-center">
                           <div className="p-2 bg-gray-100 rounded-full mr-3">
                             {getStatusIcon(process.status) || <span className="w-4 h-4 block" />}

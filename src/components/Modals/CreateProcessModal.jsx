@@ -46,7 +46,7 @@ const CreateProcessModal = ({ isOpen, onClose }) => {
             <Link to="/escribir-proceso">
               <button
                 className="flex flex-col items-center justify-center p-6 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-200 transition-colors"
-                onClick={() => console.log('Nueva escritura')}
+                onClick={() => console.log(sessionStorage)}
               >
                 <div className="bg-blue-100 p-3 rounded-full mb-3">
                   <FileText size={24} className="text-blue-600" />

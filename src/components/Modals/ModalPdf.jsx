@@ -43,7 +43,7 @@ const ModalPdf = () => {
         setError('');
 
         try {
-            await axios.put('http://localhost:8000/api/escrituras/pdf_actualizacion/'+cedula+"/", formData, {
+            await axios.put('http://localhost:8000/api/escrituras/pdf_actualizacion/'+escrituraId+"/", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

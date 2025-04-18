@@ -14,7 +14,7 @@ const CorrectionsListPage = () => {
     setLoading(true);
     try {
       const userId = sessionStorage.getItem('cedula');
-      const response = await axios.get(`http://localhost:8000/api/correccion/usuario/${userId}/`);
+      const response = await axios.get(`http://localhost:8000/api/correcciones/usuario/${userId}/`);
       setCorrections(response.data);
       corrections.map((c) => console.log(c.is_resolved))
     } catch (error) {

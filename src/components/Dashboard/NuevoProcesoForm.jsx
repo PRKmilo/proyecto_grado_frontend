@@ -30,10 +30,11 @@ const NuevoProcesoForm = () => {
     const fetchProcesos = async () => {
       setIsLoading(true);
       try {
-        
+        console.log()
         // Replace with your actual API endpoint for processes
         const response = await axios.get('http://localhost:8000/api/procesos/');
         console.log(response)
+        console.log(sessionStorage)
         setProcesosList(response.data);
       } catch (error) {
         console.error('Error fetching processes:', error);
@@ -47,11 +48,19 @@ const NuevoProcesoForm = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    console.log(formData)
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value 
     }));
-
+    console.log("linea 55 xxxxxxxxxxxxxxxxxxxxxxxxxxx")
+    console.log(formData)
+    setFormData(prev => ({
+      ...prev, 
+      user_id: sessionStorage.getItem("cedula")
+    }));
+    console.log("linea 60 -----------------------------------------")
+    console.log(formData)
     // Clear any existing error for this field
     if (errors[name]) {
       setErrors(prev => ({
@@ -111,7 +120,8 @@ const NuevoProcesoForm = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      alert('Escritura creada correctamente');
+      alert('Escritura creada correctamente'+formData.user_id);
+      alert(formData.user_id);
       navigate('/dashboard');
     } catch (error) {
       console.error('Error al crear proceso:', error);
@@ -223,7 +233,7 @@ const NuevoProcesoForm = () => {
             </div>
 
             <div>
-              <label className="block text-gray-700 mb-2">Fecha de Inicio</label>
+              <label className="block text-gray-700 mb-2">Fecha de r</label>
               <input
                 type="date"
                 name="fecha_inicio"
