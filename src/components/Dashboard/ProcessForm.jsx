@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Save, AlertCircle, CheckCircle, Calendar, Clock, User, FileText, Activity } from 'lucide-react';
+import API_BASE_URL from "../../config";
 
 const ProcessForm = () => {
   const [formData, setFormData] = useState({
@@ -73,7 +74,7 @@ const ProcessForm = () => {
 
     try {
       // Siempre crear un nuevo proceso
-      const response = await axios.post('http://localhost:8000/api/procesos/', formData);
+      const response = await axios.post(`http://${API_BASE_URL}/api/procesos/`, formData);
 
       setSuccess(true);
       setFormData(prev => ({

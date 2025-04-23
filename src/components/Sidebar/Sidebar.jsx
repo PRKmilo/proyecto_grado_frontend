@@ -130,7 +130,7 @@ const Sidebar = ({ onToggle }) => {
 
 
 
-                        {rol !== 7 && (
+                        {rol === 4 && (
                             <Link to="/correccion-lista" className='block mx-3'>
                             <button className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} px-4 py-3 ${darkMode ? 'hover:bg-blue-600/20' : 'hover:bg-blue-200'} rounded-lg mx-3 transition-all group`}>
                                 <div className="flex items-center">

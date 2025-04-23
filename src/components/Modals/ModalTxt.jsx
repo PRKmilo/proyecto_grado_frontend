@@ -3,6 +3,7 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ArrowLeft, FileText, Download, Save, Loader, X, Edit3, Plus, Trash2, MoveUp, MoveDown } from 'lucide-react';
 import { jsPDF } from 'jspdf';
+import API_BASE_URL from "../../config";
 
 const ModalTxt = () => {
   const { escrituraId } = useParams();
@@ -257,7 +258,7 @@ const ModalTxt = () => {
       console.log(sessionStorage);
       
 
-      await axios.put(`http://127.0.0.1:8000/api/escrituras/${escrituraId}/`, formData, {
+      await axios.put(`http://${API_BASE_URL}/api/escrituras/${escrituraId}/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
