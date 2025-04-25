@@ -85,22 +85,7 @@ function LoginForm() {
 	        
         showNotification("Inicio de sesión exitoso", "success");
 	navigate("/dashboard")
-	/*
-        if(response.data.rol_id === "4"){
-	  navigate("/notary");
-        }
-        if(rol === 5){
-	  console.log("Ingreso al path 5");
-          navigate("/judge");
-        }
-        if(rol === 6){
-	  console.log("Ingreso al path 6");
-          navigate("/endorser");
-        }
-        if(rol === 7){
-	  console.log("Ingreso al path 7");
-          navigate("/client");
-        }*/
+
       }
     } catch (error) {
       const message = error.response?.data?.message || "Código 2FA inválido";
@@ -323,7 +308,12 @@ function LoginForm() {
         <div className="hidden lg:block lg:w-2/5 bg-blue-900 relative">
           <div className="absolute inset-0 flex flex-col items-center justify-between p-8 text-white">
             <div className="w-full flex justify-center">
-              <Shield className="w-16 h-16" />
+	  {/* <Shield className="w-16 h-16" /> */}
+	  <img
+	      src="https://d1.awsstatic.com/customer-references-case-studies-logos/universidad-el-bosque-logo%402x.3131df936a3d390d10827f189ae1905c96d296e6.png"
+	      alt="Escudo"
+	      className="w-32 h-32 object-contain"
+	    />
             </div>
             
             <div className="text-center">

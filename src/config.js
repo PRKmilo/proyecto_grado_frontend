@@ -1,4 +1,4 @@
-const API_BASE_URL = "3.16.212.144";
+const API_BASE_URL = "3.145.17.30";
 
 export default API_BASE_URL;
 
