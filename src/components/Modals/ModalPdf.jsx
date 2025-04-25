@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Upload, X, FileText, Check, Loader, ArrowLeft } from 'lucide-react';
+import API_BASE_URL from "../../config";
 
 const ModalPdf = () => {
     const { escrituraId } = useParams();
@@ -43,7 +44,7 @@ const ModalPdf = () => {
         setError('');
 
         try {
-            await axios.put('http://localhost:8000/api/escrituras/pdf_actualizacion/'+escrituraId+"/", formData, {
+            await axios.put(`http://${API_BASE_URL}/api/escrituras/pdf_actualizacion/`+escrituraId+"/", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

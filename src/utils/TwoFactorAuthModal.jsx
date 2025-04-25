@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { QRCodeCanvas } from "qrcode.react";
+import API_BASE_URL from "../config";
 
 const TwoFactorAuthModal = ({ isOpen, onClose }) => {
   const [password, setPassword] = useState('');
@@ -30,7 +31,7 @@ const TwoFactorAuthModal = ({ isOpen, onClose }) => {
       console.log("Datos enviados:", { cedula, password });
 
       const response = await axios.post(
-        'http://127.0.0.1:8000/api/mfa/activar/', 
+        `http://${API_BASE_URL}/api/mfa/activar/`, 
         { cedula, password }, 
         {
           headers: { 

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import { User, Lock, LogIn, AlertTriangle, CheckCircle, Shield, Mail, Key } from "lucide-react";
+import API_BASE_URL from "../../config";
 
 function LoginForm() {
   const [cedula, setCedula] = useState("");
@@ -24,14 +25,21 @@ function LoginForm() {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/login/",
+        `http://${API_BASE_URL}/api/login/`,
         {
           cedula: cedula,
           password: password
         }
       );
       console.log(response.data);
-      
+
+    if (response.data.mfa_required) {
+      setEmail(response.data.email); // si te llega el correo desde el backend
+      setShowMfaForm(true);
+      return;
+    }
+
+
       if (response.status === 200) {
         console.log(response.data);
         // Almacenamos los datos en sesión
@@ -62,7 +70,7 @@ function LoginForm() {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/mfa/verificar/",
+        `http://${API_BASE_URL}/api/mfa/verificar/`,
         {
           email: email,
           codigo: code
@@ -71,23 +79,13 @@ function LoginForm() {
 
       if (response.status === 200) {
         // Almacenamos los datos en sesión
-        sessionStorage.setItem("cedula", response.data.cedula);
-        sessionStorage.setItem("rol", response.data.rol_id);
+        sessionStorage.setItem("cedula", email);
+        sessionStorage.setItem("rol", response.data.usuario_rol);
         sessionStorage.setItem("token", response.data.access);
-        
+	        
         showNotification("Inicio de sesión exitoso", "success");
-        if(response.data.rol_id === 4){
-          navigate("/notary");
-        }
-        if(response.data.rol_id === 5){
-          navigate("/judge");
-        }
-        if(response.data.rol_id === 6){
-          navigate("/endorser");
-        }
-        if(response.data.rol_id === 7){
-          navigate("/client");
-        }
+	navigate("/dashboard")
+
       }
     } catch (error) {
       const message = error.response?.data?.message || "Código 2FA inválido";
@@ -310,7 +308,12 @@ function LoginForm() {
         <div className="hidden lg:block lg:w-2/5 bg-blue-900 relative">
           <div className="absolute inset-0 flex flex-col items-center justify-between p-8 text-white">
             <div className="w-full flex justify-center">
-              <Shield className="w-16 h-16" />
+	  {/* <Shield className="w-16 h-16" /> */}
+	  <img
+	      src="https://d1.awsstatic.com/customer-references-case-studies-logos/universidad-el-bosque-logo%402x.3131df936a3d390d10827f189ae1905c96d296e6.png"
+	      alt="Escudo"
+	      className="w-32 h-32 object-contain"
+	    />
             </div>
             
             <div className="text-center">

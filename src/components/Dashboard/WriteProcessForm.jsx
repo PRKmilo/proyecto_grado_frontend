@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import  { autoTable } from 'jspdf-autotable';
+import API_BASE_URL from "../../config";
 
 const WriteProcessForm = () => {
     const [fields, setFields] = useState([]);
@@ -41,7 +42,7 @@ const WriteProcessForm = () => {
         const fetchProcesos = async () => {
             setIsLoading(true);
             try {
-                const response = await axios.get('http://localhost:8000/api/procesos/');
+                const response = await axios.get(`http://${API_BASE_URL}/api/procesos/`);
                 setProcesosList(response.data);
             } catch (error) {
                 console.error('Error fetching processes:', error);
@@ -275,7 +276,7 @@ ${'_'.repeat(70)}
 
             console.log(formData)
             // Enviar al backend
-            const response = await axios.post('http://localhost:8000/api/escrituras/', formDataToSend, {
+            const response = await axios.post(`http://${API_BASE_URL}/api/escrituras/`, formDataToSend, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             

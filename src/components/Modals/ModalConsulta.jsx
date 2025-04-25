@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../../config";
 
 const ModalConsulta = ({ isOpen, onClose, consultaId }) => {
     const [data, setData] = useState([]);
@@ -20,6 +21,8 @@ const ModalConsulta = ({ isOpen, onClose, consultaId }) => {
     });
     const modalRef = useRef(null);
     const navigate = useNavigate();
+    const [estadoEscrituras, setEstadoEscrituras] = useState({}); 
+    let API_USE = `http://${API_BASE_URL}/api/validar-smart-contract/`;
 
     // Filtros
     const [filtros, setFiltros] = useState({
@@ -32,15 +35,22 @@ const ModalConsulta = ({ isOpen, onClose, consultaId }) => {
 
     // Lista de municipios únicos para el select
     const [municipios, setMunicipios] = useState([]);
+    if(sessionStorage.getItem("rol") === "7"){
+        API_USE = `http://${API_BASE_URL}/api/validar-beneficiario/`;
+    }
 
     useEffect(() => {
         if (isOpen && consultaId) {
             setLoading(true);
-            axios.get(`http://127.0.0.1:8000/api/procesos/escrituras/${consultaId}`)
+            axios.get(`http://${API_BASE_URL}/api/procesos/escrituras/${consultaId}`)
                 .then(response => {
                     setData(response.data);
                     setFilteredData(response.data);
                     setLoading(false);
+
+		    response.data.forEach(item => {
+	                consultarEstadoEscritura(item.numero_escritura);
+	            });
 
                     // Extraer municipios únicos para el filtro
                     const uniqueMunicipios = [...new Set(response.data.map(item => item.municipio))];
@@ -52,7 +62,6 @@ const ModalConsulta = ({ isOpen, onClose, consultaId }) => {
                 });
         }
     }, [isOpen, consultaId]);
-
     // Efecto para aplicar filtros cuando cambian
     useEffect(() => {
         aplicarFiltros();
@@ -163,11 +172,26 @@ const ModalConsulta = ({ isOpen, onClose, consultaId }) => {
     };
 
     const consultarEstadoProceso = (escrituraId) => {
-        axios.get(`http://127.0.0.1:8000/api/consultar-etapa/${escrituraId}`)
+        axios.get(`http://${API_BASE_URL}/api/consultar-etapa/${escrituraId}`)
             .then(response => {
                 console.log(response.data)
                 setEstadoProcesos(prev => ({ ...prev, [escrituraId]: response.data }));
             })
+            .catch(err => {
+                console.error("Error al obtener el estado del proceso", err);
+            });
+    };
+
+    const consultarEstadoEscritura = (escrituraId) => {
+        axios.get(`http://${API_BASE_URL}/api/consultar-etapa/${escrituraId}`)
+            .then(response => {
+                setEstadoEscrituras(prev => ({
+                    ...prev,
+		    [escrituraId]: response.data
+	        }));
+            console.log("Verificacion estado",response.data);
+	    console.log("Verificacion EstadoEscritura",estadoEscrituras);
+	    })
             .catch(err => {
                 console.error("Error al obtener el estado del proceso", err);
             });
@@ -189,16 +213,16 @@ const ModalConsulta = ({ isOpen, onClose, consultaId }) => {
     const desbloquearEscritura = (escrituraId) => {
         const cedula = sessionStorage.getItem("cedula");
         const role = sessionStorage.getItem("rol");
-        const password = prompt("Ingrese la contraseña para desbloquear:");
+        const password = prompt("🔒 Ingrese su contraseña:\n\n(El texto se verá en pantalla por seguridad del sistema)");
 
             if (password) {
-                const peticion1 = axios.post(`http://127.0.0.1:8000/api/desbloquear-cuenta/${escrituraId}/`, {
+                const peticion1 = axios.post(`http://${API_BASE_URL}/api/desbloquear-cuenta/${escrituraId}/`, {
                     rol_id: role,
                     password,
                     user_id: cedula
                 });
 
-                const peticion2 = axios.post(`http://127.0.0.1:8000/api/rol-validacion/${escrituraId}/`, {
+                const peticion2 = axios.post(`http://${API_BASE_URL}/api/rol-validacion/${escrituraId}/`, {
                     escritura_id: escrituraId,
                     role_id: role
                 });
@@ -274,7 +298,7 @@ const ModalConsulta = ({ isOpen, onClose, consultaId }) => {
             payload.posicion_final = correccionData.posicionFinal;
         }
 
-        axios.post(`http://127.0.0.1:8000/api/validar-smart-contract/`, payload)
+        axios.post(API_USE, payload)
             .then(() => {
                 alert(`Escritura ${validar ? "validada" : "no validada"} correctamente.`);
                 setModalConfirmacion({ open: false, escrituraId: null, validar: null });
@@ -318,7 +342,7 @@ const ModalConsulta = ({ isOpen, onClose, consultaId }) => {
                         </button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className="grid grid-cols-1 gap-4 mb-4">
                         <div className="flex flex-col gap-2">
                             <div className="flex">
                                 <input
@@ -461,14 +485,18 @@ const ModalConsulta = ({ isOpen, onClose, consultaId }) => {
                             {item.direccion_temporal_data && (
                                 <div className="mb-6">
                                     <a
-                                        href={item.direccion_temporal_data}
+                                        href={
+					  item.direccion_temporal_data.endsWith('.txt')
+					  ? item.direccion_temporal_data2
+					  : item.direccion_temporal_data
+					}
                                         download
                                         className="flex items-center justify-center py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
-                                        Descargar PDF
+                                        Consultar PDF
                                     </a>
                                 </div>
                             )}
@@ -505,6 +533,7 @@ const ModalConsulta = ({ isOpen, onClose, consultaId }) => {
                                             </svg>
                                             Desbloquear
                                         </button>
+				{(sessionStorage.getItem("rol") === "4" && estadoEscrituras[item.numero_escritura] < 5) && (
                                         <button
                                             onClick={() => corregirEscritura(item.numero_escritura, item.direccion_temporal_data)}
                                             className="py-2 px-4 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition shadow flex items-center"
@@ -514,6 +543,7 @@ const ModalConsulta = ({ isOpen, onClose, consultaId }) => {
                                             </svg>
                                             Corregir
                                         </button>
+						    )}
                                     </div>
                                 )}
                             </div>

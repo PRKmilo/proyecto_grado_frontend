@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Bell, AlertCircle, Clock, CheckCircle, Loader2, RefreshCw } from 'lucide-react';
 import ModalConsulta from '../Modals/ModalConsulta';
+import API_BASE_URL from "../../config";
 
 const ProcessListTable = () => {
   const [processes, setProcesses] = useState([]);
@@ -20,9 +21,9 @@ const ProcessListTable = () => {
 
         let processesResponse;
         if (userRole === "7") {
-          processesResponse = await axios.get(`http://127.0.0.1:8000/api/procesos/usuario/${userId}/`);
+          processesResponse = await axios.get(`http://${API_BASE_URL}/api/procesos/usuario/${userId}/`);
         } else {
-          processesResponse = await axios.get("http://127.0.0.1:8000/api/procesos/");
+          processesResponse = await axios.get(`http://${API_BASE_URL}/api/procesos/`);
         }
 
         if (Array.isArray(processesResponse.data)) {
@@ -54,7 +55,7 @@ const ProcessListTable = () => {
         socketRef.current.close();
       }
    
-      socketRef.current = new WebSocket(`ws://127.0.0.1:8000/ws/notifications/${userId}/`);
+      socketRef.current = new WebSocket(`ws://${API_BASE_URL}/ws/notifications/${userId}/`);
 
       socketRef.current.onopen = () => {
         console.log("✅ Conectado al WebSocket de notificaciones");
@@ -103,9 +104,9 @@ const ProcessListTable = () => {
       const userRole = sessionStorage.getItem("rol");
       let processesResponse;
       if (userRole === "7") {
-        processesResponse = await axios.get(`http://127.0.0.1:8000/api/procesos/usuario/${userId}/`);
+        processesResponse = await axios.get(`http://${API_BASE_URL}/api/procesos/usuario/${userId}/`);
       } else {
-        processesResponse = await axios.get("http://127.0.0.1:8000/api/procesos/");
+        processesResponse = await axios.get(`http://${API_BASE_URL}/api/procesos/`);
       }
       if (Array.isArray(processesResponse.data)) {
         setProcesses(

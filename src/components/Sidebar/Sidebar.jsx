@@ -114,23 +114,10 @@ const Sidebar = ({ onToggle }) => {
                                 </div>
                                 {!isCollapsed && <ChevronRight size={16} className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />}
                             </button>
-                        )}
-
-                        <Link to="/dashboard" className="block mx-3">
-                            <button className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} w-full px-4 py-3 ${darkMode ? 'hover:bg-blue-600/20' : 'hover:bg-blue-200'} rounded-lg transition-all group`}>
-                                <div className="flex items-center">
-                                    <div className={`${darkMode ? 'bg-blue-500/20' : 'bg-blue-500/30'} rounded-lg p-2.5 group-hover:scale-105 transition-all`}>
-                                        <Eye size={18} className="text-blue-400" />
-                                    </div>
-                                    {!isCollapsed && <span className="ml-3 font-medium">Ver procesos Activos</span>}
-                                </div>
-                                {!isCollapsed && <ChevronRight size={16} className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />}
-                            </button>
-                        </Link>
+                        )}   
 
 
-
-                        {rol !== 7 && (
+                        {rol === 4 && (
                             <Link to="/correccion-lista" className='block mx-3'>
                             <button className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} px-4 py-3 ${darkMode ? 'hover:bg-blue-600/20' : 'hover:bg-blue-200'} rounded-lg mx-3 transition-all group`}>
                                 <div className="flex items-center">

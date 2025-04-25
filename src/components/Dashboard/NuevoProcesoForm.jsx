@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Save, ArrowLeft, User, FileText, Building } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import API_BASE_URL from "../../config";
 
 const NuevoProcesoForm = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const NuevoProcesoForm = () => {
     cedula_catastral: '',
     beneficiario_id: '',
     user_id: sessionStorage.getItem("cedula") || '', 
-    archivo_pdf: null
+    archivo_txt: null
   });
 
   const [errors, setErrors] = useState({});
@@ -32,7 +33,7 @@ const NuevoProcesoForm = () => {
       try {
         console.log()
         // Replace with your actual API endpoint for processes
-        const response = await axios.get('http://localhost:8000/api/procesos/');
+        const response = await axios.get(`http://${API_BASE_URL}/api/procesos/`);
         console.log(response)
         console.log(sessionStorage)
         setProcesosList(response.data);
@@ -73,7 +74,7 @@ const NuevoProcesoForm = () => {
   const handleFileChange = (e) => {
     setFormData(prev => ({
       ...prev,
-      archivo_pdf: e.target.files[0]
+      archivo_txt: e.target.files[0]
     }));
   };
 
@@ -116,7 +117,7 @@ const NuevoProcesoForm = () => {
 
     try {
       // Replace with your actual API endpoint
-      const response = await axios.post('http://localhost:8000/api/escrituras/', submitFormData, {
+      const response = await axios.post(`http://${API_BASE_URL}/api/escrituras/`, submitFormData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
@@ -233,7 +234,7 @@ const NuevoProcesoForm = () => {
             </div>
 
             <div>
-              <label className="block text-gray-700 mb-2">Fecha de r</label>
+              <label className="block text-gray-700 mb-2">Fecha de registro</label>
               <input
                 type="date"
                 name="fecha_inicio"
@@ -328,7 +329,7 @@ const NuevoProcesoForm = () => {
               <label className="block text-gray-700 mb-2">Archivo PDF</label>
               <input
                 type="file"
-                name="archivo_pdf"
+                name="archivo_txt"
                 onChange={handleFileChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />

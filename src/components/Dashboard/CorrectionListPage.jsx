@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Loader2, RefreshCw, AlertCircle } from 'lucide-react';
+import API_BASE_URL from "../../config";
 
 const CorrectionsListPage = () => {
   const [corrections, setCorrections] = useState([]);
@@ -14,8 +15,9 @@ const CorrectionsListPage = () => {
     setLoading(true);
     try {
       const userId = sessionStorage.getItem('cedula');
-      const response = await axios.get(`http://localhost:8000/api/correcciones/usuario/${userId}/`);
+      const response = await axios.get(`http://${API_BASE_URL}/api/correcciones/usuario/${userId}/`);
       setCorrections(response.data);
+      console.log(response.data);
       corrections.map((c) => console.log(c.is_resolved))
     } catch (error) {
       console.error('Error al cargar correcciones:', error);
@@ -58,7 +60,7 @@ const CorrectionsListPage = () => {
                   <tr>
                     <th className="py-2 px-4">ID</th>
                     <th className="py-2 px-4">Descripción</th>
-                    <th className="py-2 px-4">Comentario</th>
+                    <th className="py-2 px-4">ID_Escritura</th>
                     <th className="py-2 px-4">Línea</th>
                     <th className="py-2 px-4">Inicio</th>
                     <th className="py-2 px-4">Fin</th>
@@ -72,10 +74,10 @@ const CorrectionsListPage = () => {
                       <tr key={correction.id_correcion} className="border-b hover:bg-gray-100">
                         <td className="py-2 px-4">{correction.id_correcion}</td>
                         <td className="py-2 px-4">{correction.descripcion}</td>
-                        <td className="py-2 px-4">{correction.comment}</td>
-                        <td className="py-2 px-4">{correction.line_number}</td>
-                        <td className="py-2 px-4">{correction.start_position}</td>
-                        <td className="py-2 px-4">{correction.end_position}</td>
+                        <td className="py-2 px-4">{correction.notificacion.id_escritura}</td>
+                        <td className="py-2 px-4">{correction.linea}</td>
+                        <td className="py-2 px-4">{correction.inicio}</td>
+                        <td className="py-2 px-4">{correction.fin}</td>
                         <td className="py-2 px-4">{correction.is_resolved ? 'Sí' : 'No'}</td>
                       </tr>
                     ))
